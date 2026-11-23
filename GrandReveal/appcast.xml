@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>GrandReveal</title>
+        <item>
+            <title>0.0.13</title>
+            <pubDate>Mon, 23 Nov 2026 02:52:22 +0000</pubDate>
+            <sparkle:version>13</sparkle:version>
+            <sparkle:shortVersionString>0.0.13</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/grandreveal-v0.0.13/GrandReveal.dmg" length="1351015" type="application/octet-stream" sparkle:edSignature="SF99QOT4MaW8vJeoDhbFpKGqKVBBeQ+3pmOxfpd1G5COWFW+YX27Z3rlg4X2atBr5lBRGTBRcfcVAEEVffPhCQ=="/>
+        </item>
+    </channel>
+</rss>
