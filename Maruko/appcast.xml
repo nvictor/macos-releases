@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Maruko</title>
+        <item>
+            <title>0.0.44</title>
+            <pubDate>Mon, 23 Nov 2026 02:58:21 +0000</pubDate>
+            <sparkle:version>44</sparkle:version>
+            <sparkle:shortVersionString>0.0.44</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/maruko-v0.0.44/Maruko.dmg" length="1449763" type="application/octet-stream" sparkle:edSignature="ppu+d+UMLdXqPgEis4WvrNuFbbWd4R5JpL9P+iL5c5f0q+4M7nCFrrhKbUv/fMayWngULYKZ8Kot1WMnDnC+Bg=="/>
+        </item>
+    </channel>
+</rss>
