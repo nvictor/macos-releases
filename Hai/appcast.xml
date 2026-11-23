@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Hai</title>
+        <item>
+            <title>0.0.10</title>
+            <pubDate>Mon, 23 Nov 2026 02:56:07 +0000</pubDate>
+            <sparkle:version>10</sparkle:version>
+            <sparkle:shortVersionString>0.0.10</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/hai-v0.0.10/Hai.dmg" length="6903835" type="application/octet-stream" sparkle:edSignature="8sLnPPz+NssonXrZ2EYZDNfxUk9eVHhMgfqW4lit0mPyVLLIZOa9aOhd+SbyAFANTYSNeXkFAciPQQiJR/7sCQ=="/>
+        </item>
+    </channel>
+</rss>
