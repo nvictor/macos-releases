@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Jiraiya</title>
+        <item>
+            <title>0.0.28</title>
+            <pubDate>Mon, 23 Nov 2026 03:01:49 +0000</pubDate>
+            <sparkle:version>28</sparkle:version>
+            <sparkle:shortVersionString>0.0.28</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.5</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/jiraiya-v0.0.28/Jiraiya.dmg" length="2928089" type="application/octet-stream" sparkle:edSignature="wgQ+8oeVVa9K03hs8sT/9CHz5TAZOhHo+jD+ulxooB0XK/2pJI3RAl7Yy63UqUVj54g4B85fJDro+1vCbFbMDQ=="/>
+        </item>
+    </channel>
+</rss>
