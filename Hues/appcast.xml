@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Hues</title>
+        <item>
+            <title>0.0.1</title>
+            <pubDate>Mon, 23 Nov 2026 02:29:13 +0000</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.0.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.2</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/hues-v0.0.1/Hues.dmg" length="1186892" type="application/octet-stream" sparkle:edSignature="6tCN+Huba9fssKKp8RsiB5NA2qJGY8U47oFu9TIFmWNVhLSm9tT8RGaUb7zeXWqcysjR0I4lrJ3dmrz7bWceCA=="/>
+        </item>
+    </channel>
+</rss>
