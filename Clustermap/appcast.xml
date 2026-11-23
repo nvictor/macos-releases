@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Clustermap</title>
+        <item>
+            <title>0.1.25</title>
+            <pubDate>Mon, 23 Nov 2026 02:33:44 +0000</pubDate>
+            <sparkle:version>1046.1</sparkle:version>
+            <sparkle:shortVersionString>0.1.25</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.5</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/clustermap-v0.1.25/Clustermap.dmg" length="3294119" type="application/octet-stream" sparkle:edSignature="2pxR6Em9JsqdEUG3hC0hl+6O9RlZ7zr3oLPiJSZZLcfyxbzRKPPfdMxTZUicGVYDtLDKxrCjmRpNiDcbashgDw=="/>
+        </item>
+    </channel>
+</rss>
