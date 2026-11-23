@@ -1,0 +1,302 @@
+# App-agnostic release workflow. Copy it unchanged into any app repo laid out as:
+#
+#   <App>/<App>.xcodeproj         scheme <App>, Sparkle package
+#   <App>/Info.plist              SUFeedURL, SUPublicEDKey = $(SPARKLE_PUBLIC_ED_KEY)
+#   <App>/ExportOptions-macOS.plist
+#   <App>/ExportOptions-iOS.plist (optional, its presence turns on the iOS TestFlight job)
+#
+# The app name comes from the .xcodeproj, the version from the tag (v1.2.3 -> 1.2.3),
+# the build number from the run number. Release with: git tag v1.2.3 && git push origin v1.2.3
+#
+# Secrets (same values for every app):
+#   DEVELOPER_ID_P12, DEVELOPER_ID_P12_PASSWORD, APPLE_ID, APPLE_TEAM_ID,
+#   APP_SPECIFIC_PASSWORD, SPARKLE_PUBLIC_ED_KEY, SPARKLE_PRIVATE_KEY,
+#   RELEASES_TOKEN (fine-grained PAT, nvictor/macos-releases, contents: read/write)
+#
+# Releases are published to the public nvictor/macos-releases repo, never to the app repo:
+#   DMG      https://github.com/nvictor/macos-releases/releases/tag/<app>-v<version>
+#   appcast  https://raw.githubusercontent.com/nvictor/macos-releases/main/<App>/appcast.xml
+# Set SUFeedURL in <App>/Info.plist to the appcast URL.
+# iOS only, when <App>/ExportOptions-iOS.plist exists:
+#   APPLE_DISTRIBUTION_P12, APPLE_DISTRIBUTION_P12_PASSWORD, ASC_KEY_P8, ASC_KEY_ID, ASC_ISSUER_ID
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  SIGNING_IDENTITY: "Developer ID Application: Victor Noagbodji (2DZ6D8C78T)"
+
+jobs:
+  detect:
+    name: Detect platforms
+    runs-on: ubuntu-latest
+    outputs:
+      ios: ${{ steps.ios.outputs.ios }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Look for ExportOptions-iOS.plist
+        id: ios
+        run: |
+          if ls */ExportOptions-iOS.plist >/dev/null 2>&1; then
+            echo "ios=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ios=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  macos:
+    name: macOS (Developer ID, DMG)
+    runs-on: xcode-27
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_27*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "${XCODE:-/Applications/Xcode.app}"
+          xcodebuild -version
+
+      - name: Resolve app name and version
+        run: |
+          PROJECT=$(ls -d */*.xcodeproj | head -1)
+          test -n "$PROJECT"
+          APP=$(basename "$PROJECT" .xcodeproj)
+          {
+            echo "APP=$APP"
+            echo "APP_DIR=$(dirname "$PROJECT")"
+            echo "PROJECT=$PROJECT"
+            if [ "$GITHUB_REF_TYPE" = tag ]; then
+              echo "VERSION_ARG=MARKETING_VERSION=${GITHUB_REF_NAME#v}"
+            fi
+          } >> "$GITHUB_ENV"
+          mkdir -p build
+
+      - name: Import Developer ID Certificate
+        env:
+          P12: ${{ secrets.DEVELOPER_ID_P12 }}
+          P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+        run: |
+          test -n "$P12"
+          echo "$P12" | base64 --decode > build/DeveloperID.p12
+          security create-keychain -p "" build.keychain
+          security import build/DeveloperID.p12 -k build.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+          security list-keychains -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings -t 3600 -l build.keychain
+          security set-key-partition-list -S apple-tool:,apple: -k "" build.keychain
+
+      - name: Build and Archive App
+        env:
+          SPARKLE_PUBLIC_ED_KEY: ${{ secrets.SPARKLE_PUBLIC_ED_KEY }}
+        run: |
+          set -o pipefail
+          test -n "$SPARKLE_PUBLIC_ED_KEY"
+          xcodebuild -project "$PROJECT" \
+            -scheme "$APP" \
+            -configuration Release \
+            -archivePath "$PWD/build/$APP.xcarchive" \
+            -derivedDataPath "$PWD/build/DerivedData" \
+            -destination "platform=macOS,arch=arm64" \
+            ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
+            DEBUG_INFORMATION_FORMAT="dwarf" \
+            ENABLE_HARDENED_RUNTIME=YES \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            SPARKLE_PUBLIC_ED_KEY="$SPARKLE_PUBLIC_ED_KEY" \
+            $VERSION_ARG \
+            archive
+
+      - name: Export App
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$PWD/build/$APP.xcarchive" \
+            -exportOptionsPlist "$PWD/$APP_DIR/ExportOptions-macOS.plist" \
+            -exportPath "$PWD/build"
+
+      - name: Notarize app
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+        run: |
+          ditto -c -k --keepParent "build/$APP.app" "build/$APP.zip"
+          xcrun notarytool submit "build/$APP.zip" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APP_SPECIFIC_PASSWORD" \
+            --wait
+          xcrun stapler staple "build/$APP.app"
+
+      - name: Create DMG
+        run: |
+          rm -rf build/dmg-staging "build/$APP.dmg"
+          mkdir -p build/dmg-staging
+          ditto "build/$APP.app" "build/dmg-staging/$APP.app"
+          ln -s /Applications build/dmg-staging/Applications
+          for attempt in 1 2 3; do
+            if hdiutil create -volname "$APP" \
+              -srcfolder "build/dmg-staging" \
+              -fs HFS+ -ov -format UDZO "$PWD/build/$APP.dmg"; then
+              break
+            fi
+            if [ "$attempt" = 3 ]; then
+              echo "hdiutil failed after 3 attempts" >&2
+              exit 1
+            fi
+            echo "hdiutil attempt $attempt failed, retrying"
+            sleep 5
+          done
+          ls -la "build/$APP.dmg"
+
+      - name: Generate Sparkle appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          test -n "$SPARKLE_PRIVATE_KEY"
+          mkdir -p build/sparkle-updates
+          cp "build/$APP.dmg" "build/sparkle-updates/$APP.dmg"
+          printf '%s' "$SPARKLE_PRIVATE_KEY" > build/sparkle_ed25519.key
+          chmod 600 build/sparkle_ed25519.key
+          build/DerivedData/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast \
+            --ed-key-file build/sparkle_ed25519.key \
+            --download-url-prefix "https://github.com/nvictor/macos-releases/releases/download/$(echo "$APP" | tr '[:upper:]' '[:lower:]')-$GITHUB_REF_NAME/" \
+            build/sparkle-updates
+
+      - name: Publish to macos-releases
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+        run: |
+          test -n "$GH_TOKEN"
+          shopt -s nullglob
+          SLUG=$(echo "$APP" | tr '[:upper:]' '[:lower:]')
+          VERSION="${GITHUB_REF_NAME#v}"
+          gh release create "$SLUG-$GITHUB_REF_NAME" "build/$APP.dmg" build/sparkle-updates/*.delta \
+            --repo nvictor/macos-releases \
+            --title "$APP $VERSION" \
+            --notes "$APP $VERSION"
+          git clone "https://x-access-token:$GH_TOKEN@github.com/nvictor/macos-releases.git" build/releases
+          mkdir -p "build/releases/$APP"
+          cp build/sparkle-updates/appcast.xml "build/releases/$APP/appcast.xml"
+          cd build/releases
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$APP/appcast.xml"
+          git commit -m "Publish $APP $VERSION"
+          git push origin main
+
+      - name: Upload DMG as workflow artifact
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP }}-dmg
+          path: build/${{ env.APP }}.dmg
+
+  ios:
+    name: iOS (TestFlight)
+    needs: detect
+    if: needs.detect.outputs.ios == 'true'
+    runs-on: xcode-27
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_27*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "${XCODE:-/Applications/Xcode.app}"
+          xcodebuild -version
+
+      - name: Resolve app name and version
+        run: |
+          PROJECT=$(ls -d */*.xcodeproj | head -1)
+          test -n "$PROJECT"
+          APP=$(basename "$PROJECT" .xcodeproj)
+          {
+            echo "APP=$APP"
+            echo "APP_DIR=$(dirname "$PROJECT")"
+            echo "PROJECT=$PROJECT"
+            if [ "$GITHUB_REF_TYPE" = tag ]; then
+              echo "VERSION_ARG=MARKETING_VERSION=${GITHUB_REF_NAME#v}"
+            fi
+          } >> "$GITHUB_ENV"
+          mkdir -p build
+
+      - name: Import Apple Distribution Certificate
+        env:
+          P12: ${{ secrets.APPLE_DISTRIBUTION_P12 }}
+          P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
+        run: |
+          test -n "$P12"
+          echo "$P12" | base64 --decode > build/Distribution.p12
+          security create-keychain -p "" ios.keychain
+          security import build/Distribution.p12 -k ios.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+          security list-keychains -d user -s ios.keychain login.keychain
+          security unlock-keychain -p "" ios.keychain
+          security set-keychain-settings -t 3600 -l ios.keychain
+          security set-key-partition-list -S apple-tool:,apple: -k "" ios.keychain
+
+      - name: Write App Store Connect API key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: echo "$ASC_KEY_P8" | base64 --decode > build/AuthKey.p8
+
+      - name: Archive iOS App
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -o pipefail
+          xcodebuild -project "$PROJECT" \
+            -scheme "$APP" \
+            -configuration Release \
+            -archivePath "$PWD/build/$APP-iOS.xcarchive" \
+            -destination "generic/platform=iOS" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$PWD/build/AuthKey.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            $VERSION_ARG \
+            archive
+
+      - name: Export IPA
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$PWD/build/$APP-iOS.xcarchive" \
+            -exportOptionsPlist "$PWD/$APP_DIR/ExportOptions-iOS.plist" \
+            -exportPath "$PWD/build/ios" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$PWD/build/AuthKey.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      # xcodebuild's own upload rejects the API key with Xcode 27, altool accepts it.
+      - name: Upload to TestFlight
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          cp build/AuthKey.p8 ~/.appstoreconnect/private_keys/AuthKey_$ASC_KEY_ID.p8
+          xcrun altool --upload-app --type ios \
+            -f "build/ios/$APP.ipa" \
+            --apiKey "$ASC_KEY_ID" \
+            --apiIssuer "$ASC_ISSUER_ID"
