@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Grooves</title>
+        <item>
+            <title>0.0.14</title>
+            <pubDate>Mon, 23 Nov 2026 02:47:46 +0000</pubDate>
+            <sparkle:version>13</sparkle:version>
+            <sparkle:shortVersionString>0.0.14</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/grooves-v0.0.14/Grooves.dmg" length="1875527" type="application/octet-stream" sparkle:edSignature="qaidRdxXSkSNUMLjoI7BDe6gSRLKO+tKX58V7OzOo+ELsY7Y+p2Se7cneyMmeStxjf7Arm/28wIzN54S+WfcCA=="/>
+        </item>
+    </channel>
+</rss>
