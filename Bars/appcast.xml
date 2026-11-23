@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Bars</title>
+        <item>
+            <title>0.0.7</title>
+            <pubDate>Mon, 23 Nov 2026 02:17:20 +0000</pubDate>
+            <sparkle:version>7</sparkle:version>
+            <sparkle:shortVersionString>0.0.7</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.2</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/bars-v0.0.7/Bars.dmg" length="2020274" type="application/octet-stream" sparkle:edSignature="SE/v3CZfbzmoozNMZmeSRL5FDpoZ+EtYY8rKs98kB62ddQXVmL5IjKFJTp/lWf8trlbNcM6SbZFfcLBpVZ+aDA=="/>
+        </item>
+    </channel>
+</rss>
