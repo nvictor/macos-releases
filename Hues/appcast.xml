@@ -3,12 +3,12 @@
     <channel>
         <title>Hues</title>
         <item>
-            <title>0.0.7</title>
-            <pubDate>Tue, 24 Nov 2026 03:28:36 +0000</pubDate>
-            <sparkle:version>7</sparkle:version>
-            <sparkle:shortVersionString>0.0.7</sparkle:shortVersionString>
+            <title>0.0.9</title>
+            <pubDate>Tue, 24 Nov 2026 17:59:26 +0000</pubDate>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>0.0.9</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>27.2</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/hues-v0.0.7/Hues.dmg" length="1712139" type="application/octet-stream" sparkle:edSignature="ZlrNFT+1CQoRIazHoi4a0ZVB0wgEqn5o4R5FNVNlaUlo6TBaO5I5DebHAWM/hmO3NNMhYKop5xZo4m2BYErgCg=="/>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/hues-v0.0.9/Hues.dmg" length="1721361" type="application/octet-stream" sparkle:edSignature="62CYNb2SuImDIRYqUGC7nQI3u6TSb8Bo1/QQV+9stx7RkeAkteqgLSbu+bAcKUNKssQF97VP+R/rBRx58EprBg=="/>
         </item>
     </channel>
 </rss>
