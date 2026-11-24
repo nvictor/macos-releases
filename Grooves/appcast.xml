@@ -3,12 +3,12 @@
     <channel>
         <title>Grooves</title>
         <item>
-            <title>0.0.17</title>
-            <pubDate>Tue, 24 Nov 2026 03:21:22 +0000</pubDate>
-            <sparkle:version>16</sparkle:version>
-            <sparkle:shortVersionString>0.0.17</sparkle:shortVersionString>
+            <title>0.0.18</title>
+            <pubDate>Tue, 24 Nov 2026 21:38:39 +0000</pubDate>
+            <sparkle:version>17</sparkle:version>
+            <sparkle:shortVersionString>0.0.18</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/grooves-v0.0.17/Grooves.dmg" length="1583603" type="application/octet-stream" sparkle:edSignature="oiouFtdNeE9fgS2pJKaNSzkwY/3mTrSXzBVNb6Q420+WEVL5KRU7+POKf3KbQtTjTCstfGa6YtLxYwTLdVmzBw=="/>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/grooves-v0.0.18/Grooves.dmg" length="1597756" type="application/octet-stream" sparkle:edSignature="Vg/j3+nBpo/JtMSVH5NYeDetNEN7flbFRjWm2OKZuuyay1lfMicI4355HHEOGaru0yZbvnhk6y1+pCKFqt18BQ=="/>
         </item>
     </channel>
 </rss>
