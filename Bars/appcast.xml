@@ -3,12 +3,12 @@
     <channel>
         <title>Bars</title>
         <item>
-            <title>0.0.12</title>
-            <pubDate>Tue, 24 Nov 2026 17:27:51 +0000</pubDate>
-            <sparkle:version>12</sparkle:version>
-            <sparkle:shortVersionString>0.0.12</sparkle:shortVersionString>
+            <title>0.0.14</title>
+            <pubDate>Tue, 24 Nov 2026 21:40:13 +0000</pubDate>
+            <sparkle:version>14</sparkle:version>
+            <sparkle:shortVersionString>0.0.14</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>27.2</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/bars-v0.0.12/Bars.dmg" length="1726149" type="application/octet-stream" sparkle:edSignature="YxQv+5OYYEYTABwqexBnOz2/ZjsMtLdzbcmxFug1/BU1Gs04GBQhp847iFQtVhBAGDd/mAvD9oDJqF9tRLMmBw=="/>
+            <enclosure url="https://github.com/nvictor/macos-releases/releases/download/bars-v0.0.14/Bars.dmg" length="1744961" type="application/octet-stream" sparkle:edSignature="GmZXSNRbPzlBBIfA8FqVN9OYgNJRPjWj9mCvbqkzQooqwwZngqyd2qOHMWoVWVaMptsHTCQSmhKBDBPzlVvIAQ=="/>
         </item>
     </channel>
 </rss>
